@@ -1,5 +1,6 @@
 abstract class Stm {
 	abstract int maxargs();
+	abstract Table interp(Table t);
 }
 
 class CompoundStm extends Stm {
@@ -7,6 +8,10 @@ class CompoundStm extends Stm {
 	CompoundStm(Stm s1, Stm s2) {stm1=s1; stm2=s2;}
 	int maxargs() {
 		return Math.max(stm1.maxargs(), stm2.maxargs());
+	}
+	
+	Table interp(Table t) {
+		return stm2.interp(stm1.interp(t));
 	}
 }
 
@@ -16,6 +21,10 @@ class AssignStm extends Stm {
 	int maxargs() {
 		return exp.maxargs();		
 	}
+	Table interp(Table t) {
+		IntAndTable it = exp.interp(t);
+		return new Table(id, it.i, t);
+	}
 }
 
 class PrintStm extends Stm {
@@ -24,10 +33,25 @@ class PrintStm extends Stm {
 	int maxargs() {
 		return Math.max(exps.size(), exps.maxargs());
 	}
+		
+	Table interp(Table t) {
+		ExpList head = exps;
+		Table current_table = t;
+		while (head != null) {
+			IntAndTable head_it = head.interp(current_table);
+			System.out.print(head_it.i);
+			head = head.next();
+			current_table = head_it.t;
+			if (head != null) System.out.print(" ");			
+		}
+		System.out.println();
+		return current_table;
+	}
 }
 
 abstract class Exp {
 	abstract int maxargs();
+	abstract IntAndTable interp(Table t);
 }
 
 class IdExp extends Exp {
@@ -36,6 +60,9 @@ class IdExp extends Exp {
 	int maxargs() {
 		return 0;
 	}
+	IntAndTable interp(Table t) {
+		return new IntAndTable(t.lookup(id), t);
+	}
 }
 
 class NumExp extends Exp {
@@ -43,6 +70,9 @@ class NumExp extends Exp {
 	NumExp(int n) {num=n;}
 	int maxargs() {
 		return 0;
+	}
+	IntAndTable interp(Table t) {
+		return new IntAndTable(num, t);
 	}
 }
 
@@ -53,6 +83,16 @@ class OpExp extends Exp {
 	int maxargs() {
 		return Math.max(left.maxargs(), right.maxargs());
 	}
+	IntAndTable interp(Table t) {
+		IntAndTable left_it = left.interp(t);
+		IntAndTable right_it = right.interp(left_it.t);
+		
+		int l = left_it.i;
+		int r = right_it.i;
+		
+		int num = (Plus == oper) ? l + r : (Minus == oper) ? l - r : (Times == oper) ? l * r : (Div == oper) ? l / r : 0;
+		return new IntAndTable(num, right_it.t);
+	}
 }
 
 class EseqExp extends Exp {
@@ -61,11 +101,19 @@ class EseqExp extends Exp {
 	int maxargs() {
 		return Math.max(stm.maxargs(), exp.maxargs());
 	}
+	IntAndTable interp(Table t) {
+		Table t2 = stm.interp(t);
+		return exp.interp(t2);
+	}
 }
 
 abstract class ExpList {
 	abstract int size();
 	abstract int maxargs();
+	abstract IntAndTable interp(Table t);
+	ExpList next() {
+		return null;
+	}
 }
 
 class PairExpList extends ExpList {
@@ -77,6 +125,12 @@ class PairExpList extends ExpList {
 	}
 	int maxargs() {
 		return Math.max(head.maxargs(), tail.maxargs());
+	}
+	IntAndTable interp(Table t) {
+		return head.interp(t);
+	}
+	ExpList next() {
+		return tail;
 	}
 }
 
@@ -90,5 +144,9 @@ class LastExpList extends ExpList {
 	
 	int maxargs() {
 		return head.maxargs();
+	}
+	
+	IntAndTable interp(Table t) {
+		return head.interp(t);
 	}
 }

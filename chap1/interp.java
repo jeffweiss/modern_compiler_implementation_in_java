@@ -1,6 +1,42 @@
-class interp {
-	static void interp(Stm s) {
+class Table {
+	String id;
+	int value;
+	Table tail;
+	Table(String i, int v, Table t) {
+		id = i;
+		value = v;
+		tail = t;
+	}
+	
+	int lookup(String key) {
+		if (id.equals(key)) { 
+			return value; 
+		} else if (tail != null) {
+			return tail.lookup(key);
+		} else {
+			return 0;
+		}
+	}
+	
+	Table update(String key, int value) {
+		return new Table(key, value, this);
+	}
+}
 
+class IntAndTable {
+	int i;
+	Table t;
+	
+	IntAndTable(int ii, Table tt) {
+		i = ii;
+		t = tt;
+	}
+}
+
+class interp {
+	
+	static void interp(Stm s) {
+		s.interp(null);
 	}
 
 	/**
