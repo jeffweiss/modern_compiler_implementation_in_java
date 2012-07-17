@@ -40,11 +40,12 @@ class Exer {
 	
 	public static void main(String[] args) {
 		Tree t = null;
-		String[] letters = { "t", "s", "p", "i", "p", "f", "b", "s", "t"};
+		//String[] letters = { "t", "s", "p", "i", "p", "f", "b", "s", "t"};
+		String[] letters = { "a", "b", "c", "d", "e", "f", "g", "h", "i"};
 		for(int i=0; i< letters.length; ++i) {
 			t = insert(letters[i], letters[i].hashCode(), t);
 		}
-		//System.out.println(t);
+		System.out.println(t);
 		//for(int i=0; i< letters.length; ++i) {
 		//	System.out.println("Tree contains '" + letters[i] + "': " + t.member(letters[i]));
 		//}
