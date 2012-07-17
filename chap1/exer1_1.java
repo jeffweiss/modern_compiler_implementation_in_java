@@ -1,11 +1,13 @@
 class Tree {
 	Tree left;
 	String key;
+	Object value;
 	Tree right;
 	
-	Tree(Tree l, String k, Tree r) {
+	Tree(Tree l, String k, Object v, Tree r) {
 		left = l;
 		key = k;
+		value = v;
 		right = r;
 	}
 	
@@ -19,20 +21,20 @@ class Tree {
 	public String toString() {
 		String l = (left != null) ? left.toString() : "";
 		String r = (right != null) ? right.toString() : "";
-		return "{key: "+ key+", left: " + l + ", right: " + r + "}";
+		return "{key: "+ key+", value: " + value + ", left: " + l + ", right: " + r + "}";
 	}
 }
 
 class Exer {
-	static Tree insert(String key, Tree t)	{
+	static Tree insert(String key, Object binding, Tree t)	{
 		if (t == null) {
-			return new Tree(null, key, null);
+			return new Tree(null, key, binding, null);
 		} else if (key.compareTo(t.key) < 0) {
-			return new Tree(insert(key, t.left), t.key, t.right);
+			return new Tree(insert(key, binding, t.left), t.key, t.value, t.right);
 		} else if (key.compareTo(t.key) > 0) {
-			return new Tree(t.left, t.key, insert(key, t.right));
+			return new Tree(t.left, t.key, t.value, insert(key, binding, t.right));
 		} else {
-			return new Tree(t.left, key, t.right);
+			return new Tree(t.left, key, binding, t.right);
 		}
 	}
 	
@@ -40,7 +42,7 @@ class Exer {
 		Tree t = null;
 		String[] letters = { "t", "s", "p", "i", "p", "f", "b", "s", "t"};
 		for(int i=0; i< letters.length; ++i) {
-			t = insert(letters[i], t);
+			t = insert(letters[i], letters[i].hashCode(), t);
 		}
 		//System.out.println(t);
 		//for(int i=0; i< letters.length; ++i) {
