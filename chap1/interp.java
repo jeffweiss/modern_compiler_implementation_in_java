@@ -3,26 +3,10 @@ class interp {
 
 	}
 
-	/**
-	 * determines how many expressions are in the ExpList linked-list.
-	 */
-	static int size(ExpList el) {
-		if (el instanceof PairExpList) {
-			PairExpList pel = (PairExpList) el;
-			// tail recursion (because the compiler can optimize)
-			return 1 + size(pel.tail);
-		} else if (el instanceof LastExpList) {
-			return 1;
-		}
-
-		//hmm, we're of sometype of ExpList that's unknown, just return be size 0
-		return 0;
-	}
-
 	static int count(Stm s) {
 		if (s instanceof PrintStm) {
 			PrintStm ps = (PrintStm) s;
-			return size(ps.exps);
+			return ps.exps.size();
 		}
 		return 0;
 	}
